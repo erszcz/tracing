@@ -240,17 +240,39 @@ iex> Tr.dump("traces.ets")
 The traces are now safe on disk, so we can analyse them on a different machine,
 resume the next day, etc.
 
+We'll use `traces.ets` saved in the repo, so that trace numbers between
+the file and this document match.
+
 ```elixir
+iex> Tr.load("traces.ets")
 iex> import ExDoctor  # to get the `tr` record in the shell
 iex> Tr.select(fn tr(data: false) = t -> t end)         # uses record pattern matching with :ets.select
 iex> Tr.filter(fn t -> Tr.contains_data(false, t) end)  # uses any boolean predicate
-iex> Tr.traceback(730)  # all calls leading up to trace 730, latest call/trace first
-iex> Tr.traceback(730, %{order: :bottom_up})  # as above, but in order of calling
-iex> Tr.range(511)  # all calls leading to trace 511 and their return values
-iex> Tr.range(511) |> length
-iex> Tr.range(511) |> print  # analyse bottom-up to see that at some point remainder(fac(n), 10) = 1
-iex> Tr.range(511) |> Enum.drop(210) |> print
+iex> Tr.traceback(736)  # all calls leading up to trace 736, latest call/trace first
+iex> Tr.traceback(736, %{order: :bottom_up})  # as above, but in order of calling
+iex> Tr.range(507)  # all calls leading to trace 511 and their return values
+iex> Tr.range(507) |> length
+iex> Tr.range(507) |> print  # analyse bottom-up to see that at some point remainder(fac(n), 10) = 1
+iex> Tr.range(507) |> Enum.drop(210) |> print  # print just the tail
 ```
+
+Please note that `~c"\r"` in
+
+```elixir
+  {:tr, 718, #PID<0.200.0>, :call, {Tracing.Factorial.TailRec, :of, 1}, ~c"\r",
+   1764769309092601, :no_info}
+```
+
+Actually stands for 13 - it's a quirk of how Erlang/Elixir handle printing
+strings (lists of small integers):
+
+```elixir
+iex> [n] = ~c"\r"
+~c"\r"
+iex> n
+13
+```
+
 
 ### Copying traces from remote environments for local analysis
 
