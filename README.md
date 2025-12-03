@@ -300,7 +300,7 @@ iex> Tr.stop_tracing()
 iex> Tr.dump("/tmp/traces.ets")
 ```
 
-Copying a file from an ECS container:
+Copying small files directly from an ECS container:
 
 ```
 $ myapp_iex.sh staging backend-worker
@@ -318,17 +318,16 @@ $ aws ecs execute-command \
     | awk '/START/{include=1; next} /END/{include=0} include' - | base64 -d | gunzip ; echo
 ```
 
-Copying `/tmp/traces.ets` - the same, just more handy for quick copy-pasting:
+Uploading traces to S3 and generating a presigned URL for quick download:
 
-```
-export TASK_ARN=arn:aws:ecs:eu-west-1:723258730172:task/myapp-staging/eee223583ec741f68dce6486e5fa1ecc
-aws ecs execute-command \
-    --region eu-west-1 --cluster myapp-staging --task "$TASK_ARN" --container backend  --interactive \
-    --command "sh -c 'echo START; gzip --stdout /tmp/traces.ets | base64; echo END'" \
-    | awk '/START/{include=1; next} /END/{include=0} include' - | base64 -d | gunzip ; echo
-```
+```elixir
+workspace_id = "0196afeb-2919-7dc4-bbdc-bb5a44ca3564"
+key = "radek.szymczyszyn/traces.ets"
+file_content = File.read!("/tmp/traces.ets")
 
-TODO: Tracing an action triggered from the UI
+{:ok, _headers} = MyApp.Storage.upload_bytes(workspace_id, key, file_content)
+{:ok, _download_url} = MyApp.Storage.sign_download_url(workspace_id, key)
+```
 
 
 <!--
