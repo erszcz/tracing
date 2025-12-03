@@ -1,0 +1,1330 @@
+iex(mynode-a@127.0.0.1)77>
+nil
+iex(mynode-a@127.0.0.1)78> (Oban.check_all_queues(Oban) |> Enum.group_by(& &1.node))[to_string(node())] |> Enum.map(&Map.take(&1, [:node, :queue, :paused])) |> Enum.filter(&match?(%{queue: "amazon_textract_reply"}, &1)) |> Enum.split_with(&match?(%{paused: true}, &1))
+{[],
+ [%{node: "mynode-a@127.0.0.1", queue: "amazon_textract_reply", paused: false}]}
+iex(mynode-a@127.0.0.1)79>
+nil
+iex(mynode-a@127.0.0.1)80>
+nil
+iex(mynode-a@127.0.0.1)81>
+nil
+iex(mynode-a@127.0.0.1)82> dbg_opts = [limit: :infinity]
+[limit: :infinity]
+iex(mynode-a@127.0.0.1)83>
+nil
+iex(mynode-a@127.0.0.1)84> tf = fn
+...(mynode-a@127.0.0.1)84>   {:trace, _pid, :call,
+...(mynode-a@127.0.0.1)84>    {Oban.Notifiers.Phoenix, :notify, [_server, :signal = _channel, _ = _payload]}} = _trace,
+...(mynode-a@127.0.0.1)84>   acc ->
+...(mynode-a@127.0.0.1)84>     # {:trace, _pid, :call, {Oban.Notifiers.Phoenix, :notify, _args}} = _trace, acc ->
+...(mynode-a@127.0.0.1)84>     dbg(_trace, dbg_opts)
+...(mynode-a@127.0.0.1)84>     :ok
+...(mynode-a@127.0.0.1)84>
+...(mynode-a@127.0.0.1)84>   {:trace, _pid, :call, {Oban.Queue.Producer, :handle_info, _args}} =
+...(mynode-a@127.0.0.1)84>       _trace,
+...(mynode-a@127.0.0.1)84>   acc ->
+...(mynode-a@127.0.0.1)84>     if match?(
+...(mynode-a@127.0.0.1)84>          [
+...(mynode-a@127.0.0.1)84>            {:notification, :signal, %{"action" => "pause"}},
+...(mynode-a@127.0.0.1)84>            %{meta: %{queue: "amazon_textract_reply"}}
+...(mynode-a@127.0.0.1)84>          ],
+...(mynode-a@127.0.0.1)84>          _args
+...(mynode-a@127.0.0.1)84>        ) do
+...(mynode-a@127.0.0.1)84>       dbg(_trace, dbg_opts)
+...(mynode-a@127.0.0.1)84>     end
+...(mynode-a@127.0.0.1)84>
+...(mynode-a@127.0.0.1)84>     :ok
+...(mynode-a@127.0.0.1)84>
+...(mynode-a@127.0.0.1)84>   {:trace, _pid, :call, {Oban.Notifier, :relay, [_, _, :signal, _] = _args}} = _trace, acc ->
+...(mynode-a@127.0.0.1)84>     # if match?(
+...(mynode-a@127.0.0.1)84>     #     [_oban_config, _, :signal, _],
+...(mynode-a@127.0.0.1)84>     #     _args
+...(mynode-a@127.0.0.1)84>     #   ) do
+...(mynode-a@127.0.0.1)84>     #  dbg(_trace, dbg_opts)
+...(mynode-a@127.0.0.1)84>     # end
+...(mynode-a@127.0.0.1)84>     dbg(_trace, dbg_opts)
+...(mynode-a@127.0.0.1)84>
+...(mynode-a@127.0.0.1)84>     :ok
+...(mynode-a@127.0.0.1)84>
+...(mynode-a@127.0.0.1)84>   {:trace, _pid, :call, {Oban, :pause_queue, _args}} = _trace, acc ->
+...(mynode-a@127.0.0.1)84>     dbg(_trace, dbg_opts)
+...(mynode-a@127.0.0.1)84>     :ok
+...(mynode-a@127.0.0.1)84>
+...(mynode-a@127.0.0.1)84>   {:trace, _pid, :call, {engine, :put_meta, [_, _, :paused, _]}} = _trace, acc
+...(mynode-a@127.0.0.1)84>   when engine in [Oban.Engine, Oban.Pro.Engines.Smart] ->
+...(mynode-a@127.0.0.1)84>     dbg(_trace, dbg_opts)
+...(mynode-a@127.0.0.1)84>     :ok
+...(mynode-a@127.0.0.1)84>
+...(mynode-a@127.0.0.1)84>   {:trace, _pid, :call, {_mod, _fun, _args}} = _trace, acc ->
+...(mynode-a@127.0.0.1)84>     # dbg(_trace, dbg_opts)
+...(mynode-a@127.0.0.1)84>     :ok
+...(mynode-a@127.0.0.1)84>
+...(mynode-a@127.0.0.1)84>   {:trace, _, :return_to, {:gen_server, :try_handle_info, 3}}, acc ->
+...(mynode-a@127.0.0.1)84>     :ok
+...(mynode-a@127.0.0.1)84>
+...(mynode-a@127.0.0.1)84>   _trace, acc ->
+...(mynode-a@127.0.0.1)84>     # dbg(_trace, dbg_opts)
+...(mynode-a@127.0.0.1)84>     :ok
+...(mynode-a@127.0.0.1)84> end
+warning: the underscored variable "_trace" is used after being set. A leading underscore indicates that the value of the variable should be ignored. If this is intended please rename the variable to remove the underscore
+└─ iex:89
+
+warning: variable "acc" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ iex:87
+
+warning: the underscored variable "_args" is used after being set. A leading underscore indicates that the value of the variable should be ignored. If this is intended please rename the variable to remove the underscore
+└─ iex:100
+
+warning: the underscored variable "_trace" is used after being set. A leading underscore indicates that the value of the variable should be ignored. If this is intended please rename the variable to remove the underscore
+└─ iex:102
+
+warning: variable "acc" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ iex:94
+
+warning: the underscored variable "_trace" is used after being set. A leading underscore indicates that the value of the variable should be ignored. If this is intended please rename the variable to remove the underscore
+└─ iex:114
+
+warning: variable "acc" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ iex:107
+
+warning: the underscored variable "_trace" is used after being set. A leading underscore indicates that the value of the variable should be ignored. If this is intended please rename the variable to remove the underscore
+└─ iex:119
+
+warning: variable "acc" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ iex:118
+
+warning: the underscored variable "_trace" is used after being set. A leading underscore indicates that the value of the variable should be ignored. If this is intended please rename the variable to remove the underscore
+└─ iex:124
+
+warning: variable "acc" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ iex:122
+
+warning: variable "acc" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ iex:127
+
+warning: variable "acc" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ iex:131
+
+warning: variable "acc" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ iex:134
+
+#Function<41.81571850/2 in :erl_eval.expr/6>
+iex(mynode-a@127.0.0.1)85>
+nil
+iex(mynode-a@127.0.0.1)86> :dbg.stop()
+:ok
+iex(mynode-a@127.0.0.1)87> :dbg.tracer(:process, {tf, :ok})
+{:ok, #PID<0.205191.0>}
+iex(mynode-a@127.0.0.1)88> for n <- Node.list(), do: :dbg.n(n)
+[ok: :"mynode-b@127.0.0.1"]
+iex(mynode-a@127.0.0.1)89> :dbg.p(:all, [:call, :return_to])
+{:ok,
+ [
+   {:matched, :"mynode-b@127.0.0.1", 10387},
+   {:matched, :"mynode-a@127.0.0.1", 10721}
+ ]}
+iex(mynode-a@127.0.0.1)90> :dbg.tpl(Oban, :pause_queue, [])
+{:ok,
+ [{:matched, :"mynode-b@127.0.0.1", 2}, {:matched, :"mynode-a@127.0.0.1", 2}]}
+iex(mynode-a@127.0.0.1)91> # :dbg.tpl(Oban, :pause_all_queues, :x)
+nil
+iex(mynode-a@127.0.0.1)92> # :dbg.tpl(Oban, :resume_queue, :x)
+nil
+iex(mynode-a@127.0.0.1)93> # :dbg.tpl(Oban, :resume_all_queues, :x)
+nil
+iex(mynode-a@127.0.0.1)94> # :dbg.tpl(Oban.Notifier, :apply_callback, :x)
+nil
+iex(mynode-a@127.0.0.1)95> :dbg.tpl(Oban.Notifiers.Phoenix, :notify, [])
+{:ok,
+ [{:matched, :"mynode-b@127.0.0.1", 1}, {:matched, :"mynode-a@127.0.0.1", 1}]}
+iex(mynode-a@127.0.0.1)96> :dbg.tpl(Oban.Engine, :put_meta, [])
+{:ok,
+ [{:matched, :"mynode-b@127.0.0.1", 1}, {:matched, :"mynode-a@127.0.0.1", 1}]}
+iex(mynode-a@127.0.0.1)97> :dbg.tpl(Oban.Pro.Engines.Smart, :put_meta, [])
+{:ok,
+ [{:matched, :"mynode-b@127.0.0.1", 1}, {:matched, :"mynode-a@127.0.0.1", 1}]}
+iex(mynode-a@127.0.0.1)98> :dbg.tpl(Registry, :put_meta, [])
+{:ok,
+ [{:matched, :"mynode-b@127.0.0.1", 1}, {:matched, :"mynode-a@127.0.0.1", 1}]}
+iex(mynode-a@127.0.0.1)99> :dbg.tpl(Oban.Queue.Producer, :handle_info, [])
+{:ok,
+ [{:matched, :"mynode-b@127.0.0.1", 1}, {:matched, :"mynode-a@127.0.0.1", 1}]}
+iex(mynode-a@127.0.0.1)100> :dbg.tpl(Oban.Notifier, :relay, [])
+{:ok,
+ [{:matched, :"mynode-b@127.0.0.1", 1}, {:matched, :"mynode-a@127.0.0.1", 1}]}
+iex(mynode-a@127.0.0.1)101> :dbg.tpl(Oban.Config, :match_ident?, :x)
+{:ok,
+ [
+   {:matched, :"mynode-b@127.0.0.1", 1},
+   {:matched, :"mynode-a@127.0.0.1", 1},
+   {:saved, :x}
+ ]}
+iex(mynode-a@127.0.0.1)102> Process.sleep(100)
+:ok
+[iex:119: (file)]
+_trace #=> {:trace, #PID<70219.21070.0>, :call,
+ {Oban, :pause_queue, [[queue: "amazon_textract_reply", local_only: true]]}}
+
+[iex:119: (file)]
+_trace #=> {:trace, #PID<70219.21070.0>, :call,
+ {Oban, :pause_queue,
+  [Oban, [queue: "amazon_textract_reply", local_only: true]]}}
+
+[iex:89: (file)]
+_trace #=> {:trace, #PID<70219.21070.0>, :call,
+ {Oban.Notifiers.Phoenix, :notify,
+  [
+    #PID<70219.10881.0>,
+    :signal,
+    ["H4sIAAAAAAAAE6tWKixNLU1VslJKzE2sys+LL0mtKClKTC6JL0otyKlU0lECsjPz84AKChJLi1OBApkpqXklQL5/UmKeXm5lXn5Kqm6Sg6GRuZ4BEBoq1QIA4XMo9lQAAAA="]
+  ]}}
+
+[iex:114: (file)]
+_trace #=> {:trace, #PID<0.5975.0>, :call,
+ {Oban.Notifier, :relay,
+  [
+    %Oban.Config{
+      dispatch_cooldown: 5,
+      engine: Oban.Engines.Basic,
+      get_dynamic_repo: nil,
+      insert_trigger: true,
+      log: false,
+      name: Oban,
+      node: "mynode-b@127.0.0.1",
+      notifier: {Oban.Notifiers.Postgres, []},
+      peer: {Oban.Peers.Database, []},
+      plugins: [],
+      prefix: "public",
+      queues: [],
+      repo: nil,
+      shutdown_grace_period: 15000,
+      stage_interval: 1000,
+      testing: :disabled
+    },
+    [#PID<0.6434.0>, #PID<0.6445.0>, #PID<0.6460.0>, #PID<0.6522.0>,
+     #PID<0.6379.0>, #PID<0.6500.0>, #PID<0.6526.0>, #PID<0.6559.0>,
+     #PID<0.6514.0>, #PID<0.6551.0>, #PID<0.6555.0>, #PID<0.6569.0>,
+     #PID<0.6594.0>, #PID<0.6584.0>, #PID<0.6634.0>, #PID<0.6455.0>,
+     #PID<0.6370.0>],
+    :signal,
+    "H4sIAAAAAAAAE6tWKixNLU1VslJKzE2sys+LL0mtKClKTC6JL0otyKlU0lECsjPz84AKChJLi1OBApkpqXklQL5/UmKeXm5lXn5Kqm6Sg6GRuZ4BEBoq1QIA4XMo9lQAAAA="
+  ]}}
+
+[iex:114: (file)]
+_trace #=> {:trace, #PID<70219.21070.0>, :call,
+ {Oban.Notifier, :relay,
+  [
+    %Oban.Config{
+      dispatch_cooldown: 5,
+      engine: Oban.Engines.Basic,
+      get_dynamic_repo: nil,
+      insert_trigger: true,
+      log: false,
+      name: Oban,
+      node: "mynode-b@127.0.0.1",
+      notifier: {Oban.Notifiers.Postgres, []},
+      peer: {Oban.Peers.Database, []},
+      plugins: [],
+      prefix: "public",
+      queues: [],
+      repo: nil,
+      shutdown_grace_period: 15000,
+      stage_interval: 1000,
+      testing: :disabled
+    },
+    [#PID<70219.10909.0>, #PID<70219.10958.0>, #PID<70219.10939.0>,
+     #PID<70219.10931.0>, #PID<70219.10996.0>, #PID<70219.11004.0>,
+     #PID<70219.11024.0>, #PID<70219.11016.0>, #PID<70219.11035.0>,
+     #PID<70219.11084.0>, #PID<70219.11093.0>, #PID<70219.11068.0>,
+     #PID<70219.11064.0>, #PID<70219.11075.0>, #PID<70219.11054.0>,
+     #PID<70219.11113.0>, #PID<70219.11089.0>, #PID<70219.11149.0>,
+     #PID<70219.11180.0>, #PID<70219.11167.0>, #PID<70219.11184.0>],
+    :signal,
+    "H4sIAAAAAAAAE6tWKixNLU1VslJKzE2sys+LL0mtKClKTC6JL0otyKlU0lECsjPz84AKChJLi1OBApkpqXklQL5/UmKeXm5lXn5Kqm6Sg6GRuZ4BEBoq1QIA4XMo9lQAAAA="
+  ]}}
+
+[iex:114: (file)]
+_trace #=> {:trace, #PID<0.5975.0>, :call,
+ {Oban.Notifier, :relay,
+  [
+    %Oban.Config{
+      dispatch_cooldown: 5,
+      engine: Oban.Engines.Basic,
+      get_dynamic_repo: nil,
+      insert_trigger: true,
+      log: false,
+      name: Oban,
+      node: "mynode-b@127.0.0.1",
+      notifier: {Oban.Notifiers.Postgres, []},
+      peer: {Oban.Peers.Database, []},
+      plugins: [],
+      prefix: "public",
+      queues: [],
+      repo: nil,
+      shutdown_grace_period: 15000,
+      stage_interval: 1000,
+      testing: :disabled
+    },
+    [#PID<0.6354.0>, #PID<0.6438.0>, #PID<0.6630.0>, #PID<0.6394.0>,
+     #PID<0.6389.0>, #PID<0.6564.0>, #PID<0.6530.0>, #PID<0.6539.0>,
+     #PID<0.6543.0>, #PID<0.6449.0>, #PID<0.6579.0>, #PID<0.6574.0>,
+     #PID<0.6609.0>, #PID<0.6490.0>, #PID<0.6616.0>, #PID<0.6482.0>,
+     #PID<0.6478.0>, #PID<0.6486.0>, #PID<0.6604.0>, #PID<0.6465.0>,
+     #PID<0.6404.0>, #PID<0.6385.0>, #PID<0.6510.0>, #PID<0.6646.0>],
+    :signal,
+    "H4sIAAAAAAAAE6tWKixNLU1VslJKzE2sys+LL0mtKClKTC6JL0otyKlU0lECsjPz84AKChJLi1OBApkpqXklQL5/UmKeXm5lXn5Kqm6Sg6GRuZ4BEBoq1QIA4XMo9lQAAAA="
+  ]}}
+
+[iex:114: (file)]
+_trace #=> {:trace, #PID<0.5975.0>, :call,
+ {Oban.Notifier, :relay,
+  [
+    %Oban.Config{
+      dispatch_cooldown: 5,
+      engine: Oban.Engines.Basic,
+      get_dynamic_repo: nil,
+      insert_trigger: true,
+      log: false,
+      name: Oban,
+      node: "mynode-b@127.0.0.1",
+      notifier: {Oban.Notifiers.Postgres, []},
+      peer: {Oban.Peers.Database, []},
+      plugins: [],
+      prefix: "public",
+      queues: [],
+      repo: nil,
+      shutdown_grace_period: 15000,
+      stage_interval: 1000,
+      testing: :disabled
+    },
+    [#PID<0.6414.0>, #PID<0.6424.0>, #PID<0.6419.0>, #PID<0.6547.0>,
+     #PID<0.6518.0>, #PID<0.6535.0>, #PID<0.6505.0>, #PID<0.6589.0>,
+     #PID<0.6599.0>, #PID<0.6474.0>, #PID<0.6470.0>, #PID<0.6399.0>,
+     #PID<0.6409.0>, #PID<0.6375.0>, #PID<0.6429.0>, #PID<0.6638.0>,
+     #PID<0.6626.0>, #PID<0.6642.0>, #PID<0.6654.0>, #PID<0.6650.0>],
+    :signal,
+    "H4sIAAAAAAAAE6tWKixNLU1VslJKzE2sys+LL0mtKClKTC6JL0otyKlU0lECsjPz84AKChJLi1OBApkpqXklQL5/UmKeXm5lXn5Kqm6Sg6GRuZ4BEBoq1QIA4XMo9lQAAAA="
+  ]}}
+
+[iex:102: (file)]
+_trace #=> {:trace, #PID<0.6589.0>, :call,
+ {Oban.Queue.Producer, :handle_info,
+  [
+    {:notification, :signal,
+     %{
+       "action" => "pause",
+       "ident" => "Oban.mynode-b@127.0.0.1",
+       "queue" => "amazon_textract_reply"
+     }},
+    %Oban.Queue.Producer{
+      conf: %Oban.Config{
+        dispatch_cooldown: 5,
+        engine: Oban.Pro.Engines.Smart,
+        get_dynamic_repo: nil,
+        insert_trigger: true,
+        log: false,
+        name: Oban,
+        node: "mynode-a@127.0.0.1",
+        notifier: {Oban.Notifiers.Phoenix, [pubsub: MyApp.PubSub.Redis]},
+        peer: {Oban.Peers.Database, []},
+        plugins: [
+          {Oban.Plugins.Cron,
+           [
+             crontab: [
+               {"* */8 * * *", MyApp.Billing.Internal.SyncUsageCronWorker},
+               {"*/5 * * * *", MyApp.IAM.Internal.ExpireGrantsWorker},
+               {"*/1 * * * *", MyApp.Events.Internal.RedisStreamTrimmer.Worker},
+               {"*/1 * * * *",
+                MyApp.Calculations.Internal.RescueStuckFields.Worker},
+               {"* * * * *", MyApp.FrequentCronWorker,
+                [
+                  args: %{
+                    workers: [
+                      %{
+                        name: "Elixir.MyApp.Views.Internal.ViewUpdateEntityCountWorker"
+                      }
+                    ],
+                    interval: 3000
+                  }
+                ]},
+               {"0 9 * * *",
+                MyApp.ApiKeys.Internal.NotifyUsersAboutKeyExpiryCronWorker,
+                [args: %{days_in_advance: [14, 3]}]},
+               {"@hourly", MyApp.Projects.Internal.TrimDeletedObjects.Worker,
+                [args: %{keep_last: 1209600000}]},
+               {"@hourly",
+                MyApp.Entities.Internal.CleanupPendingEntityBatchesWorker,
+                [args: %{ignore_last: 21600000}]},
+               {"@hourly",
+                MyApp.TriggersInbound.Internal.TrimBackingProjectsCronWorker}
+             ]
+           ]},
+          {MyApp.Oban.Plugins.ShutdownRescue, []},
+          {Oban.Plugins.Pruner, [max_age: 21600]},
+          {Oban.Plugins.Reindexer,
+           [
+             schedule: "0 */12 * * *",
+             indexes: ["oban_jobs_meta_index", "oban_jobs_args_index",
+              "oban_jobs_state_queue_priority_scheduled_at_id_index"]
+           ]},
+          {Oban.Pro.Plugins.DynamicLifeline, []},
+          {Oban.Met, [reporter: [estimate_limit: 1000]]}
+        ],
+        prefix: "oban",
+        queues: [
+          amazon_textract_request: [limit: 1000],
+          anthropic_request: [limit: 1000],
+          aws_bedrock_request: [limit: 1000],
+          azure_ocr_request: [limit: 1000],
+          azure_open_ai_request: [limit: 1000],
+          brave_search_request: [limit: 1000],
+          fire_crawl_request: [limit: 1000],
+          google_ai_request: [limit: 1000],
+          google_genai_request: [limit: 1000],
+          internal_request: [limit: 1000],
+          internal_python_tools_request: [limit: 50],
+          open_ai_request: [limit: 1000],
+          perplexity_request: [limit: 1000],
+          vertex_ai_claude_request: [limit: 1000],
+          default: [limit: 10],
+          billing_stripe_events: [limit: 2],
+          billing_usage_cron: [limit: 1],
+          billing_usage_sync: [limit: 10],
+          usage_async_count: [limit: 10],
+          usage_async_clean: [limit: 1],
+          project_file_upload: [limit: 10],
+          import_execution: [limit: 10],
+          export_execution: [limit: 10],
+          projects_fields_implicit_statuses_update: [limit: 10],
+          projects_view_update: [limit: 20],
+          projects_view_entity_count_update: [limit: 1],
+          projects_recalculate_entities: [global_limit: 1000, local_limit: 50],
+          redis_stream_trimmer: [global_limit: 1],
+          redis_consumer_group_cleaner: [global_limit: 1],
+          projects_rescue_stuck_fields: [global_limit: 1],
+          trim_deleted_objects: [global_limit: 1],
+          projects_resample_subproject_preview: [limit: 10],
+          api_keys_expiry_notifications_cron: [limit: 1],
+          api_key_expiry_notification: [limit: 10],
+          semantic_indexer_index_cleaner: [limit: 10],
+          integrations_sync: [limit: 10],
+          cases: [limit: 100],
+          cases_chat_integrations: [limit: 10],
+          projects_propagate_field_completion: [
+            global_limit: 1000,
+            local_limit: 100
+          ],
+          folders_hard_delete: [global_limit: 2],
+          cleanup_pending_entity_batches: [global_limit: 1],
+          project_hub_select_clean_up: [limit: 10],
+          projects_remove_deleted_inputs: [limit: 10],
+          triggers_inbound_webhooks: [limit: 10],
+          triggers_inbound_trim: [global_limit: 5],
+          triggers_inbound_trim_cron: [global_limit: 1],
+          amazon_textract_reply: [limit: 100],
+          anthropic_reply: [limit: 100],
+          aws_bedrock_reply: [limit: 100],
+          azure_ocr_reply: [limit: 100],
+          azure_open_ai_reply: [limit: 100],
+          brave_search_reply: [limit: 100],
+          fire_crawl_reply: [limit: 100],
+          google_ai_reply: [limit: 100],
+          google_genai_reply: [limit: 100],
+          internal_reply: [limit: 100],
+          internal_python_tools_reply: [limit: 100],
+          open_ai_reply: [limit: 100],
+          perplexity_reply: [limit: 100],
+          vertex_ai_claude_reply: [limit: 100]
+        ],
+        repo: MyApp.Repo.Oban,
+        shutdown_grace_period: 15000,
+        stage_interval: 1000,
+        testing: :disabled
+      },
+      foreman: {:via, Registry,
+       {Oban.Registry, {Oban, {:foreman, "amazon_textract_reply"}}}},
+      meta: %Oban.Pro.Producer{
+        __meta__: #Ecto.Schema.Metadata<:loaded, "oban", "oban_producers">,
+        uuid: "019a0c86-70de-7924-8432-baaedcf22600",
+        name: "Oban",
+        node: "mynode-a@127.0.0.1",
+        queue: "amazon_textract_reply",
+        started_at: ~U[2025-10-22 15:25:28.670464Z],
+        updated_at: ~U[2025-10-22 16:03:53.298614Z],
+        ack_async: true,
+        ack_tab: :pro_ack_tab_7,
+        refresh_interval: 30000,
+        xact_delay: 1000,
+        xact_retry: 5,
+        xact_timeout: 30000,
+        meta: %Oban.Pro.Producer.Meta{
+          local_limit: 100,
+          paused: false,
+          shutdown_started_at: nil,
+          global_limit: nil,
+          rate_limit: nil
+        }
+      },
+      name: {:via, Registry,
+       {Oban.Registry, {Oban, {:producer, "amazon_textract_reply"}}}},
+      dispatch_timer: nil,
+      refresh_timer: #Reference<0.456887917.1483735043.255523>,
+      dispatch_cooldown: 5,
+      running: %{}
+    }
+  ]}}
+
+[iex:124: (file)]
+_trace #=> {:trace, #PID<0.6589.0>, :call,
+ {Oban.Engine, :put_meta,
+  [
+    %Oban.Config{
+      dispatch_cooldown: 5,
+      engine: Oban.Pro.Engines.Smart,
+      get_dynamic_repo: nil,
+      insert_trigger: true,
+      log: false,
+      name: Oban,
+      node: "mynode-a@127.0.0.1",
+      notifier: {Oban.Notifiers.Phoenix, [pubsub: MyApp.PubSub.Redis]},
+      peer: {Oban.Peers.Database, []},
+      plugins: [
+        {Oban.Plugins.Cron,
+         [
+           crontab: [
+             {"* */8 * * *", MyApp.Billing.Internal.SyncUsageCronWorker},
+             {"*/5 * * * *", MyApp.IAM.Internal.ExpireGrantsWorker},
+             {"*/1 * * * *", MyApp.Events.Internal.RedisStreamTrimmer.Worker},
+             {"*/1 * * * *",
+              MyApp.Calculations.Internal.RescueStuckFields.Worker},
+             {"* * * * *", MyApp.FrequentCronWorker,
+              [
+                args: %{
+                  workers: [
+                    %{
+                      name: "Elixir.MyApp.Views.Internal.ViewUpdateEntityCountWorker"
+                    }
+                  ],
+                  interval: 3000
+                }
+              ]},
+             {"0 9 * * *",
+              MyApp.ApiKeys.Internal.NotifyUsersAboutKeyExpiryCronWorker,
+              [args: %{days_in_advance: [14, 3]}]},
+             {"@hourly", MyApp.Projects.Internal.TrimDeletedObjects.Worker,
+              [args: %{keep_last: 1209600000}]},
+             {"@hourly",
+              MyApp.Entities.Internal.CleanupPendingEntityBatchesWorker,
+              [args: %{ignore_last: 21600000}]},
+             {"@hourly",
+              MyApp.TriggersInbound.Internal.TrimBackingProjectsCronWorker}
+           ]
+         ]},
+        {MyApp.Oban.Plugins.ShutdownRescue, []},
+        {Oban.Plugins.Pruner, [max_age: 21600]},
+        {Oban.Plugins.Reindexer,
+         [
+           schedule: "0 */12 * * *",
+           indexes: ["oban_jobs_meta_index", "oban_jobs_args_index",
+            "oban_jobs_state_queue_priority_scheduled_at_id_index"]
+         ]},
+        {Oban.Pro.Plugins.DynamicLifeline, []},
+        {Oban.Met, [reporter: [estimate_limit: 1000]]}
+      ],
+      prefix: "oban",
+      queues: [
+        amazon_textract_request: [limit: 1000],
+        anthropic_request: [limit: 1000],
+        aws_bedrock_request: [limit: 1000],
+        azure_ocr_request: [limit: 1000],
+        azure_open_ai_request: [limit: 1000],
+        brave_search_request: [limit: 1000],
+        fire_crawl_request: [limit: 1000],
+        google_ai_request: [limit: 1000],
+        google_genai_request: [limit: 1000],
+        internal_request: [limit: 1000],
+        internal_python_tools_request: [limit: 50],
+        open_ai_request: [limit: 1000],
+        perplexity_request: [limit: 1000],
+        vertex_ai_claude_request: [limit: 1000],
+        default: [limit: 10],
+        billing_stripe_events: [limit: 2],
+        billing_usage_cron: [limit: 1],
+        billing_usage_sync: [limit: 10],
+        usage_async_count: [limit: 10],
+        usage_async_clean: [limit: 1],
+        project_file_upload: [limit: 10],
+        import_execution: [limit: 10],
+        export_execution: [limit: 10],
+        projects_fields_implicit_statuses_update: [limit: 10],
+        projects_view_update: [limit: 20],
+        projects_view_entity_count_update: [limit: 1],
+        projects_recalculate_entities: [global_limit: 1000, local_limit: 50],
+        redis_stream_trimmer: [global_limit: 1],
+        redis_consumer_group_cleaner: [global_limit: 1],
+        projects_rescue_stuck_fields: [global_limit: 1],
+        trim_deleted_objects: [global_limit: 1],
+        projects_resample_subproject_preview: [limit: 10],
+        api_keys_expiry_notifications_cron: [limit: 1],
+        api_key_expiry_notification: [limit: 10],
+        semantic_indexer_index_cleaner: [limit: 10],
+        integrations_sync: [limit: 10],
+        cases: [limit: 100],
+        cases_chat_integrations: [limit: 10],
+        projects_propagate_field_completion: [
+          global_limit: 1000,
+          local_limit: 100
+        ],
+        folders_hard_delete: [global_limit: 2],
+        cleanup_pending_entity_batches: [global_limit: 1],
+        project_hub_select_clean_up: [limit: 10],
+        projects_remove_deleted_inputs: [limit: 10],
+        triggers_inbound_webhooks: [limit: 10],
+        triggers_inbound_trim: [global_limit: 5],
+        triggers_inbound_trim_cron: [global_limit: 1],
+        amazon_textract_reply: [limit: 100],
+        anthropic_reply: [limit: 100],
+        aws_bedrock_reply: [limit: 100],
+        azure_ocr_reply: [limit: 100],
+        azure_open_ai_reply: [limit: 100],
+        brave_search_reply: [limit: 100],
+        fire_crawl_reply: [limit: 100],
+        google_ai_reply: [limit: 100],
+        google_genai_reply: [limit: 100],
+        internal_reply: [limit: 100],
+        internal_python_tools_reply: [limit: 100],
+        open_ai_reply: [limit: 100],
+        perplexity_reply: [limit: 100],
+        vertex_ai_claude_reply: [limit: 100]
+      ],
+      repo: MyApp.Repo.Oban,
+      shutdown_grace_period: 15000,
+      stage_interval: 1000,
+      testing: :disabled
+    },
+    %Oban.Pro.Producer{
+      __meta__: #Ecto.Schema.Metadata<:loaded, "oban", "oban_producers">,
+      uuid: "019a0c86-70de-7924-8432-baaedcf22600",
+      name: "Oban",
+      node: "mynode-a@127.0.0.1",
+      queue: "amazon_textract_reply",
+      started_at: ~U[2025-10-22 15:25:28.670464Z],
+      updated_at: ~U[2025-10-22 16:03:53.298614Z],
+      ack_async: true,
+      ack_tab: :pro_ack_tab_7,
+      refresh_interval: 30000,
+      xact_delay: 1000,
+      xact_retry: 5,
+      xact_timeout: 30000,
+      meta: %Oban.Pro.Producer.Meta{
+        local_limit: 100,
+        paused: false,
+        shutdown_started_at: nil,
+        global_limit: nil,
+        rate_limit: nil
+      }
+    },
+    :paused,
+    true
+  ]}}
+
+[iex:124: (file)]
+_trace #=> {:trace, #PID<0.6589.0>, :call,
+ {Oban.Pro.Engines.Smart, :put_meta,
+  [
+    %Oban.Config{
+      dispatch_cooldown: 5,
+      engine: Oban.Pro.Engines.Smart,
+      get_dynamic_repo: nil,
+      insert_trigger: true,
+      log: false,
+      name: Oban,
+      node: "mynode-a@127.0.0.1",
+      notifier: {Oban.Notifiers.Phoenix, [pubsub: MyApp.PubSub.Redis]},
+      peer: {Oban.Peers.Database, []},
+      plugins: [
+        {Oban.Plugins.Cron,
+         [
+           crontab: [
+             {"* */8 * * *", MyApp.Billing.Internal.SyncUsageCronWorker},
+             {"*/5 * * * *", MyApp.IAM.Internal.ExpireGrantsWorker},
+             {"*/1 * * * *", MyApp.Events.Internal.RedisStreamTrimmer.Worker},
+             {"*/1 * * * *",
+              MyApp.Calculations.Internal.RescueStuckFields.Worker},
+             {"* * * * *", MyApp.FrequentCronWorker,
+              [
+                args: %{
+                  workers: [
+                    %{
+                      name: "Elixir.MyApp.Views.Internal.ViewUpdateEntityCountWorker"
+                    }
+                  ],
+                  interval: 3000
+                }
+              ]},
+             {"0 9 * * *",
+              MyApp.ApiKeys.Internal.NotifyUsersAboutKeyExpiryCronWorker,
+              [args: %{days_in_advance: [14, 3]}]},
+             {"@hourly", MyApp.Projects.Internal.TrimDeletedObjects.Worker,
+              [args: %{keep_last: 1209600000}]},
+             {"@hourly",
+              MyApp.Entities.Internal.CleanupPendingEntityBatchesWorker,
+              [args: %{ignore_last: 21600000}]},
+             {"@hourly",
+              MyApp.TriggersInbound.Internal.TrimBackingProjectsCronWorker}
+           ]
+         ]},
+        {MyApp.Oban.Plugins.ShutdownRescue, []},
+        {Oban.Plugins.Pruner, [max_age: 21600]},
+        {Oban.Plugins.Reindexer,
+         [
+           schedule: "0 */12 * * *",
+           indexes: ["oban_jobs_meta_index", "oban_jobs_args_index",
+            "oban_jobs_state_queue_priority_scheduled_at_id_index"]
+         ]},
+        {Oban.Pro.Plugins.DynamicLifeline, []},
+        {Oban.Met, [reporter: [estimate_limit: 1000]]}
+      ],
+      prefix: "oban",
+      queues: [
+        amazon_textract_request: [limit: 1000],
+        anthropic_request: [limit: 1000],
+        aws_bedrock_request: [limit: 1000],
+        azure_ocr_request: [limit: 1000],
+        azure_open_ai_request: [limit: 1000],
+        brave_search_request: [limit: 1000],
+        fire_crawl_request: [limit: 1000],
+        google_ai_request: [limit: 1000],
+        google_genai_request: [limit: 1000],
+        internal_request: [limit: 1000],
+        internal_python_tools_request: [limit: 50],
+        open_ai_request: [limit: 1000],
+        perplexity_request: [limit: 1000],
+        vertex_ai_claude_request: [limit: 1000],
+        default: [limit: 10],
+        billing_stripe_events: [limit: 2],
+        billing_usage_cron: [limit: 1],
+        billing_usage_sync: [limit: 10],
+        usage_async_count: [limit: 10],
+        usage_async_clean: [limit: 1],
+        project_file_upload: [limit: 10],
+        import_execution: [limit: 10],
+        export_execution: [limit: 10],
+        projects_fields_implicit_statuses_update: [limit: 10],
+        projects_view_update: [limit: 20],
+        projects_view_entity_count_update: [limit: 1],
+        projects_recalculate_entities: [global_limit: 1000, local_limit: 50],
+        redis_stream_trimmer: [global_limit: 1],
+        redis_consumer_group_cleaner: [global_limit: 1],
+        projects_rescue_stuck_fields: [global_limit: 1],
+        trim_deleted_objects: [global_limit: 1],
+        projects_resample_subproject_preview: [limit: 10],
+        api_keys_expiry_notifications_cron: [limit: 1],
+        api_key_expiry_notification: [limit: 10],
+        semantic_indexer_index_cleaner: [limit: 10],
+        integrations_sync: [limit: 10],
+        cases: [limit: 100],
+        cases_chat_integrations: [limit: 10],
+        projects_propagate_field_completion: [
+          global_limit: 1000,
+          local_limit: 100
+        ],
+        folders_hard_delete: [global_limit: 2],
+        cleanup_pending_entity_batches: [global_limit: 1],
+        project_hub_select_clean_up: [limit: 10],
+        projects_remove_deleted_inputs: [limit: 10],
+        triggers_inbound_webhooks: [limit: 10],
+        triggers_inbound_trim: [global_limit: 5],
+        triggers_inbound_trim_cron: [global_limit: 1],
+        amazon_textract_reply: [limit: 100],
+        anthropic_reply: [limit: 100],
+        aws_bedrock_reply: [limit: 100],
+        azure_ocr_reply: [limit: 100],
+        azure_open_ai_reply: [limit: 100],
+        brave_search_reply: [limit: 100],
+        fire_crawl_reply: [limit: 100],
+        google_ai_reply: [limit: 100],
+        google_genai_reply: [limit: 100],
+        internal_reply: [limit: 100],
+        internal_python_tools_reply: [limit: 100],
+        open_ai_reply: [limit: 100],
+        perplexity_reply: [limit: 100],
+        vertex_ai_claude_reply: [limit: 100]
+      ],
+      repo: MyApp.Repo.Oban,
+      shutdown_grace_period: 15000,
+      stage_interval: 1000,
+      testing: :disabled
+    },
+    %Oban.Pro.Producer{
+      __meta__: #Ecto.Schema.Metadata<:loaded, "oban", "oban_producers">,
+      uuid: "019a0c86-70de-7924-8432-baaedcf22600",
+      name: "Oban",
+      node: "mynode-a@127.0.0.1",
+      queue: "amazon_textract_reply",
+      started_at: ~U[2025-10-22 15:25:28.670464Z],
+      updated_at: ~U[2025-10-22 16:03:53.298614Z],
+      ack_async: true,
+      ack_tab: :pro_ack_tab_7,
+      refresh_interval: 30000,
+      xact_delay: 1000,
+      xact_retry: 5,
+      xact_timeout: 30000,
+      meta: %Oban.Pro.Producer.Meta{
+        local_limit: 100,
+        paused: false,
+        shutdown_started_at: nil,
+        global_limit: nil,
+        rate_limit: nil
+      }
+    },
+    :paused,
+    true
+  ]}}
+
+[iex:114: (file)]
+_trace #=> {:trace, #PID<70219.21070.0>, :call,
+ {Oban.Notifier, :relay,
+  [
+    %Oban.Config{
+      dispatch_cooldown: 5,
+      engine: Oban.Engines.Basic,
+      get_dynamic_repo: nil,
+      insert_trigger: true,
+      log: false,
+      name: Oban,
+      node: "mynode-b@127.0.0.1",
+      notifier: {Oban.Notifiers.Postgres, []},
+      peer: {Oban.Peers.Database, []},
+      plugins: [],
+      prefix: "public",
+      queues: [],
+      repo: nil,
+      shutdown_grace_period: 15000,
+      stage_interval: 1000,
+      testing: :disabled
+    },
+    [#PID<70219.10884.0>, #PID<70219.10901.0>, #PID<70219.10918.0>,
+     #PID<70219.10968.0>, #PID<70219.10943.0>, #PID<70219.10927.0>,
+     #PID<70219.10935.0>, #PID<70219.10923.0>, #PID<70219.10913.0>,
+     #PID<70219.10972.0>, #PID<70219.11008.0>, #PID<70219.10992.0>,
+     #PID<70219.11020.0>, #PID<70219.11080.0>, #PID<70219.11045.0>,
+     #PID<70219.11109.0>, #PID<70219.11117.0>, #PID<70219.11137.0>,
+     #PID<70219.11125.0>, #PID<70219.11097.0>, #PID<70219.11162.0>,
+     #PID<70219.11121.0>],
+    :signal,
+    "H4sIAAAAAAAAE6tWKixNLU1VslJKzE2sys+LL0mtKClKTC6JL0otyKlU0lECsjPz84AKChJLi1OBApkpqXklQL5/UmKeXm5lXn5Kqm6Sg6GRuZ4BEBoq1QIA4XMo9lQAAAA="
+  ]}}
+
+[iex:114: (file)]
+_trace #=> {:trace, #PID<70219.21070.0>, :call,
+ {Oban.Notifier, :relay,
+  [
+    %Oban.Config{
+      dispatch_cooldown: 5,
+      engine: Oban.Engines.Basic,
+      get_dynamic_repo: nil,
+      insert_trigger: true,
+      log: false,
+      name: Oban,
+      node: "mynode-b@127.0.0.1",
+      notifier: {Oban.Notifiers.Postgres, []},
+      peer: {Oban.Peers.Database, []},
+      plugins: [],
+      prefix: "public",
+      queues: [],
+      repo: nil,
+      shutdown_grace_period: 15000,
+      stage_interval: 1000,
+      testing: :disabled
+    },
+    [#PID<70219.10947.0>, #PID<70219.10951.0>, #PID<70219.10892.0>,
+     #PID<70219.10980.0>, #PID<70219.11012.0>, #PID<70219.10976.0>,
+     #PID<70219.10985.0>, #PID<70219.11000.0>, #PID<70219.11050.0>,
+     #PID<70219.11060.0>, #PID<70219.11104.0>, #PID<70219.11133.0>,
+     #PID<70219.11176.0>, #PID<70219.11129.0>, #PID<70219.11145.0>,
+     #PID<70219.11172.0>, #PID<70219.11141.0>, #PID<70219.11157.0>],
+    :signal,
+    "H4sIAAAAAAAAE6tWKixNLU1VslJKzE2sys+LL0mtKClKTC6JL0otyKlU0lECsjPz84AKChJLi1OBApkpqXklQL5/UmKeXm5lXn5Kqm6Sg6GRuZ4BEBoq1QIA4XMo9lQAAAA="
+  ]}}
+
+[iex:102: (file)]
+_trace #=> {:trace, #PID<70219.11125.0>, :call,
+ {Oban.Queue.Producer, :handle_info,
+  [
+    {:notification, :signal,
+     %{
+       "action" => "pause",
+       "ident" => "Oban.mynode-b@127.0.0.1",
+       "queue" => "amazon_textract_reply"
+     }},
+    %Oban.Queue.Producer{
+      conf: %Oban.Config{
+        dispatch_cooldown: 5,
+        engine: Oban.Pro.Engines.Smart,
+        get_dynamic_repo: nil,
+        insert_trigger: true,
+        log: false,
+        name: Oban,
+        node: "mynode-b@127.0.0.1",
+        notifier: {Oban.Notifiers.Phoenix, [pubsub: MyApp.PubSub.Redis]},
+        peer: {Oban.Peers.Database, []},
+        plugins: [
+          {Oban.Plugins.Cron,
+           [
+             crontab: [
+               {"* */8 * * *", MyApp.Billing.Internal.SyncUsageCronWorker},
+               {"*/5 * * * *", MyApp.IAM.Internal.ExpireGrantsWorker},
+               {"*/1 * * * *", MyApp.Events.Internal.RedisStreamTrimmer.Worker},
+               {"*/1 * * * *",
+                MyApp.Calculations.Internal.RescueStuckFields.Worker},
+               {"* * * * *", MyApp.FrequentCronWorker,
+                [
+                  args: %{
+                    workers: [
+                      %{
+                        name: "Elixir.MyApp.Views.Internal.ViewUpdateEntityCountWorker"
+                      }
+                    ],
+                    interval: 3000
+                  }
+                ]},
+               {"0 9 * * *",
+                MyApp.ApiKeys.Internal.NotifyUsersAboutKeyExpiryCronWorker,
+                [args: %{days_in_advance: [14, 3]}]},
+               {"@hourly", MyApp.Projects.Internal.TrimDeletedObjects.Worker,
+                [args: %{keep_last: 1209600000}]},
+               {"@hourly",
+                MyApp.Entities.Internal.CleanupPendingEntityBatchesWorker,
+                [args: %{ignore_last: 21600000}]},
+               {"@hourly",
+                MyApp.TriggersInbound.Internal.TrimBackingProjectsCronWorker}
+             ]
+           ]},
+          {MyApp.Oban.Plugins.ShutdownRescue, []},
+          {Oban.Plugins.Pruner, [max_age: 21600]},
+          {Oban.Plugins.Reindexer,
+           [
+             schedule: "0 */12 * * *",
+             indexes: ["oban_jobs_meta_index", "oban_jobs_args_index",
+              "oban_jobs_state_queue_priority_scheduled_at_id_index"]
+           ]},
+          {Oban.Pro.Plugins.DynamicLifeline, []},
+          {Oban.Met, [reporter: [estimate_limit: 1000]]}
+        ],
+        prefix: "oban",
+        queues: [
+          amazon_textract_request: [limit: 1000],
+          anthropic_request: [limit: 1000],
+          aws_bedrock_request: [limit: 1000],
+          azure_ocr_request: [limit: 1000],
+          azure_open_ai_request: [limit: 1000],
+          brave_search_request: [limit: 1000],
+          fire_crawl_request: [limit: 1000],
+          google_ai_request: [limit: 1000],
+          google_genai_request: [limit: 1000],
+          internal_request: [limit: 1000],
+          internal_python_tools_request: [limit: 50],
+          open_ai_request: [limit: 1000],
+          perplexity_request: [limit: 1000],
+          vertex_ai_claude_request: [limit: 1000],
+          default: [limit: 10],
+          billing_stripe_events: [limit: 2],
+          billing_usage_cron: [limit: 1],
+          billing_usage_sync: [limit: 10],
+          usage_async_count: [limit: 10],
+          usage_async_clean: [limit: 1],
+          project_file_upload: [limit: 10],
+          import_execution: [limit: 10],
+          export_execution: [limit: 10],
+          projects_fields_implicit_statuses_update: [limit: 10],
+          projects_view_update: [limit: 20],
+          projects_view_entity_count_update: [limit: 1],
+          projects_recalculate_entities: [global_limit: 1000, local_limit: 50],
+          redis_stream_trimmer: [global_limit: 1],
+          redis_consumer_group_cleaner: [global_limit: 1],
+          projects_rescue_stuck_fields: [global_limit: 1],
+          trim_deleted_objects: [global_limit: 1],
+          projects_resample_subproject_preview: [limit: 10],
+          api_keys_expiry_notifications_cron: [limit: 1],
+          api_key_expiry_notification: [limit: 10],
+          semantic_indexer_index_cleaner: [limit: 10],
+          integrations_sync: [limit: 10],
+          cases: [limit: 100],
+          cases_chat_integrations: [limit: 10],
+          projects_propagate_field_completion: [
+            global_limit: 1000,
+            local_limit: 100
+          ],
+          folders_hard_delete: [global_limit: 2],
+          cleanup_pending_entity_batches: [global_limit: 1],
+          project_hub_select_clean_up: [limit: 10],
+          projects_remove_deleted_inputs: [limit: 10],
+          triggers_inbound_webhooks: [limit: 10],
+          triggers_inbound_trim: [global_limit: 5],
+          triggers_inbound_trim_cron: [global_limit: 1],
+          amazon_textract_reply: [limit: 100],
+          anthropic_reply: [limit: 100],
+          aws_bedrock_reply: [limit: 100],
+          azure_ocr_reply: [limit: 100],
+          azure_open_ai_reply: [limit: 100],
+          brave_search_reply: [limit: 100],
+          fire_crawl_reply: [limit: 100],
+          google_ai_reply: [limit: 100],
+          google_genai_reply: [limit: 100],
+          internal_reply: [limit: 100],
+          internal_python_tools_reply: [limit: 100],
+          open_ai_reply: [limit: 100],
+          perplexity_reply: [limit: 100],
+          vertex_ai_claude_reply: [limit: 100]
+        ],
+        repo: MyApp.Repo.Oban,
+        shutdown_grace_period: 15000,
+        stage_interval: 1000,
+        testing: :disabled
+      },
+      foreman: {:via, Registry,
+       {Oban.Registry, {Oban, {:foreman, "amazon_textract_reply"}}}},
+      meta: %Oban.Pro.Producer{
+        __meta__: #Ecto.Schema.Metadata<:loaded, "oban", "oban_producers">,
+        uuid: "019a0bd6-6223-74e1-a998-71df4aca1bf7",
+        name: "Oban",
+        node: "mynode-b@127.0.0.1",
+        queue: "amazon_textract_reply",
+        started_at: ~U[2025-10-22 12:13:10.563133Z],
+        updated_at: ~U[2025-10-22 16:03:55.098264Z],
+        ack_async: true,
+        ack_tab: :pro_ack_tab_7,
+        refresh_interval: 30000,
+        xact_delay: 1000,
+        xact_retry: 5,
+        xact_timeout: 30000,
+        meta: %Oban.Pro.Producer.Meta{
+          local_limit: 100,
+          paused: false,
+          shutdown_started_at: nil,
+          global_limit: nil,
+          rate_limit: nil
+        }
+      },
+      name: {:via, Registry,
+       {Oban.Registry, {Oban, {:producer, "amazon_textract_reply"}}}},
+      dispatch_timer: nil,
+      refresh_timer: #Reference<70219.3935728409.953679877.112484>,
+      dispatch_cooldown: 5,
+      running: %{}
+    }
+  ]}}
+
+[iex:124: (file)]
+_trace #=> {:trace, #PID<70219.11125.0>, :call,
+ {Oban.Engine, :put_meta,
+  [
+    %Oban.Config{
+      dispatch_cooldown: 5,
+      engine: Oban.Pro.Engines.Smart,
+      get_dynamic_repo: nil,
+      insert_trigger: true,
+      log: false,
+      name: Oban,
+      node: "mynode-b@127.0.0.1",
+      notifier: {Oban.Notifiers.Phoenix, [pubsub: MyApp.PubSub.Redis]},
+      peer: {Oban.Peers.Database, []},
+      plugins: [
+        {Oban.Plugins.Cron,
+         [
+           crontab: [
+             {"* */8 * * *", MyApp.Billing.Internal.SyncUsageCronWorker},
+             {"*/5 * * * *", MyApp.IAM.Internal.ExpireGrantsWorker},
+             {"*/1 * * * *", MyApp.Events.Internal.RedisStreamTrimmer.Worker},
+             {"*/1 * * * *",
+              MyApp.Calculations.Internal.RescueStuckFields.Worker},
+             {"* * * * *", MyApp.FrequentCronWorker,
+              [
+                args: %{
+                  workers: [
+                    %{
+                      name: "Elixir.MyApp.Views.Internal.ViewUpdateEntityCountWorker"
+                    }
+                  ],
+                  interval: 3000
+                }
+              ]},
+             {"0 9 * * *",
+              MyApp.ApiKeys.Internal.NotifyUsersAboutKeyExpiryCronWorker,
+              [args: %{days_in_advance: [14, 3]}]},
+             {"@hourly", MyApp.Projects.Internal.TrimDeletedObjects.Worker,
+              [args: %{keep_last: 1209600000}]},
+             {"@hourly",
+              MyApp.Entities.Internal.CleanupPendingEntityBatchesWorker,
+              [args: %{ignore_last: 21600000}]},
+             {"@hourly",
+              MyApp.TriggersInbound.Internal.TrimBackingProjectsCronWorker}
+           ]
+         ]},
+        {MyApp.Oban.Plugins.ShutdownRescue, []},
+        {Oban.Plugins.Pruner, [max_age: 21600]},
+        {Oban.Plugins.Reindexer,
+         [
+           schedule: "0 */12 * * *",
+           indexes: ["oban_jobs_meta_index", "oban_jobs_args_index",
+            "oban_jobs_state_queue_priority_scheduled_at_id_index"]
+         ]},
+        {Oban.Pro.Plugins.DynamicLifeline, []},
+        {Oban.Met, [reporter: [estimate_limit: 1000]]}
+      ],
+      prefix: "oban",
+      queues: [
+        amazon_textract_request: [limit: 1000],
+        anthropic_request: [limit: 1000],
+        aws_bedrock_request: [limit: 1000],
+        azure_ocr_request: [limit: 1000],
+        azure_open_ai_request: [limit: 1000],
+        brave_search_request: [limit: 1000],
+        fire_crawl_request: [limit: 1000],
+        google_ai_request: [limit: 1000],
+        google_genai_request: [limit: 1000],
+        internal_request: [limit: 1000],
+        internal_python_tools_request: [limit: 50],
+        open_ai_request: [limit: 1000],
+        perplexity_request: [limit: 1000],
+        vertex_ai_claude_request: [limit: 1000],
+        default: [limit: 10],
+        billing_stripe_events: [limit: 2],
+        billing_usage_cron: [limit: 1],
+        billing_usage_sync: [limit: 10],
+        usage_async_count: [limit: 10],
+        usage_async_clean: [limit: 1],
+        project_file_upload: [limit: 10],
+        import_execution: [limit: 10],
+        export_execution: [limit: 10],
+        projects_fields_implicit_statuses_update: [limit: 10],
+        projects_view_update: [limit: 20],
+        projects_view_entity_count_update: [limit: 1],
+        projects_recalculate_entities: [global_limit: 1000, local_limit: 50],
+        redis_stream_trimmer: [global_limit: 1],
+        redis_consumer_group_cleaner: [global_limit: 1],
+        projects_rescue_stuck_fields: [global_limit: 1],
+        trim_deleted_objects: [global_limit: 1],
+        projects_resample_subproject_preview: [limit: 10],
+        api_keys_expiry_notifications_cron: [limit: 1],
+        api_key_expiry_notification: [limit: 10],
+        semantic_indexer_index_cleaner: [limit: 10],
+        integrations_sync: [limit: 10],
+        cases: [limit: 100],
+        cases_chat_integrations: [limit: 10],
+        projects_propagate_field_completion: [
+          global_limit: 1000,
+          local_limit: 100
+        ],
+        folders_hard_delete: [global_limit: 2],
+        cleanup_pending_entity_batches: [global_limit: 1],
+        project_hub_select_clean_up: [limit: 10],
+        projects_remove_deleted_inputs: [limit: 10],
+        triggers_inbound_webhooks: [limit: 10],
+        triggers_inbound_trim: [global_limit: 5],
+        triggers_inbound_trim_cron: [global_limit: 1],
+        amazon_textract_reply: [limit: 100],
+        anthropic_reply: [limit: 100],
+        aws_bedrock_reply: [limit: 100],
+        azure_ocr_reply: [limit: 100],
+        azure_open_ai_reply: [limit: 100],
+        brave_search_reply: [limit: 100],
+        fire_crawl_reply: [limit: 100],
+        google_ai_reply: [limit: 100],
+        google_genai_reply: [limit: 100],
+        internal_reply: [limit: 100],
+        internal_python_tools_reply: [limit: 100],
+        open_ai_reply: [limit: 100],
+        perplexity_reply: [limit: 100],
+        vertex_ai_claude_reply: [limit: 100]
+      ],
+      repo: MyApp.Repo.Oban,
+      shutdown_grace_period: 15000,
+      stage_interval: 1000,
+      testing: :disabled
+    },
+    %Oban.Pro.Producer{
+      __meta__: #Ecto.Schema.Metadata<:loaded, "oban", "oban_producers">,
+      uuid: "019a0bd6-6223-74e1-a998-71df4aca1bf7",
+      name: "Oban",
+      node: "mynode-b@127.0.0.1",
+      queue: "amazon_textract_reply",
+      started_at: ~U[2025-10-22 12:13:10.563133Z],
+      updated_at: ~U[2025-10-22 16:03:55.098264Z],
+      ack_async: true,
+      ack_tab: :pro_ack_tab_7,
+      refresh_interval: 30000,
+      xact_delay: 1000,
+      xact_retry: 5,
+      xact_timeout: 30000,
+      meta: %Oban.Pro.Producer.Meta{
+        local_limit: 100,
+        paused: false,
+        shutdown_started_at: nil,
+        global_limit: nil,
+        rate_limit: nil
+      }
+    },
+    :paused,
+    true
+  ]}}
+
+[iex:124: (file)]
+_trace #=> {:trace, #PID<70219.11125.0>, :call,
+ {Oban.Pro.Engines.Smart, :put_meta,
+  [
+    %Oban.Config{
+      dispatch_cooldown: 5,
+      engine: Oban.Pro.Engines.Smart,
+      get_dynamic_repo: nil,
+      insert_trigger: true,
+      log: false,
+      name: Oban,
+      node: "mynode-b@127.0.0.1",
+      notifier: {Oban.Notifiers.Phoenix, [pubsub: MyApp.PubSub.Redis]},
+      peer: {Oban.Peers.Database, []},
+      plugins: [
+        {Oban.Plugins.Cron,
+         [
+           crontab: [
+             {"* */8 * * *", MyApp.Billing.Internal.SyncUsageCronWorker},
+             {"*/5 * * * *", MyApp.IAM.Internal.ExpireGrantsWorker},
+             {"*/1 * * * *", MyApp.Events.Internal.RedisStreamTrimmer.Worker},
+             {"*/1 * * * *",
+              MyApp.Calculations.Internal.RescueStuckFields.Worker},
+             {"* * * * *", MyApp.FrequentCronWorker,
+              [
+                args: %{
+                  workers: [
+                    %{
+                      name: "Elixir.MyApp.Views.Internal.ViewUpdateEntityCountWorker"
+                    }
+                  ],
+                  interval: 3000
+                }
+              ]},
+             {"0 9 * * *",
+              MyApp.ApiKeys.Internal.NotifyUsersAboutKeyExpiryCronWorker,
+              [args: %{days_in_advance: [14, 3]}]},
+             {"@hourly", MyApp.Projects.Internal.TrimDeletedObjects.Worker,
+              [args: %{keep_last: 1209600000}]},
+             {"@hourly",
+              MyApp.Entities.Internal.CleanupPendingEntityBatchesWorker,
+              [args: %{ignore_last: 21600000}]},
+             {"@hourly",
+              MyApp.TriggersInbound.Internal.TrimBackingProjectsCronWorker}
+           ]
+         ]},
+        {MyApp.Oban.Plugins.ShutdownRescue, []},
+        {Oban.Plugins.Pruner, [max_age: 21600]},
+        {Oban.Plugins.Reindexer,
+         [
+           schedule: "0 */12 * * *",
+           indexes: ["oban_jobs_meta_index", "oban_jobs_args_index",
+            "oban_jobs_state_queue_priority_scheduled_at_id_index"]
+         ]},
+        {Oban.Pro.Plugins.DynamicLifeline, []},
+        {Oban.Met, [reporter: [estimate_limit: 1000]]}
+      ],
+      prefix: "oban",
+      queues: [
+        amazon_textract_request: [limit: 1000],
+        anthropic_request: [limit: 1000],
+        aws_bedrock_request: [limit: 1000],
+        azure_ocr_request: [limit: 1000],
+        azure_open_ai_request: [limit: 1000],
+        brave_search_request: [limit: 1000],
+        fire_crawl_request: [limit: 1000],
+        google_ai_request: [limit: 1000],
+        google_genai_request: [limit: 1000],
+        internal_request: [limit: 1000],
+        internal_python_tools_request: [limit: 50],
+        open_ai_request: [limit: 1000],
+        perplexity_request: [limit: 1000],
+        vertex_ai_claude_request: [limit: 1000],
+        default: [limit: 10],
+        billing_stripe_events: [limit: 2],
+        billing_usage_cron: [limit: 1],
+        billing_usage_sync: [limit: 10],
+        usage_async_count: [limit: 10],
+        usage_async_clean: [limit: 1],
+        project_file_upload: [limit: 10],
+        import_execution: [limit: 10],
+        export_execution: [limit: 10],
+        projects_fields_implicit_statuses_update: [limit: 10],
+        projects_view_update: [limit: 20],
+        projects_view_entity_count_update: [limit: 1],
+        projects_recalculate_entities: [global_limit: 1000, local_limit: 50],
+        redis_stream_trimmer: [global_limit: 1],
+        redis_consumer_group_cleaner: [global_limit: 1],
+        projects_rescue_stuck_fields: [global_limit: 1],
+        trim_deleted_objects: [global_limit: 1],
+        projects_resample_subproject_preview: [limit: 10],
+        api_keys_expiry_notifications_cron: [limit: 1],
+        api_key_expiry_notification: [limit: 10],
+        semantic_indexer_index_cleaner: [limit: 10],
+        integrations_sync: [limit: 10],
+        cases: [limit: 100],
+        cases_chat_integrations: [limit: 10],
+        projects_propagate_field_completion: [
+          global_limit: 1000,
+          local_limit: 100
+        ],
+        folders_hard_delete: [global_limit: 2],
+        cleanup_pending_entity_batches: [global_limit: 1],
+        project_hub_select_clean_up: [limit: 10],
+        projects_remove_deleted_inputs: [limit: 10],
+        triggers_inbound_webhooks: [limit: 10],
+        triggers_inbound_trim: [global_limit: 5],
+        triggers_inbound_trim_cron: [global_limit: 1],
+        amazon_textract_reply: [limit: 100],
+        anthropic_reply: [limit: 100],
+        aws_bedrock_reply: [limit: 100],
+        azure_ocr_reply: [limit: 100],
+        azure_open_ai_reply: [limit: 100],
+        brave_search_reply: [limit: 100],
+        fire_crawl_reply: [limit: 100],
+        google_ai_reply: [limit: 100],
+        google_genai_reply: [limit: 100],
+        internal_reply: [limit: 100],
+        internal_python_tools_reply: [limit: 100],
+        open_ai_reply: [limit: 100],
+        perplexity_reply: [limit: 100],
+        vertex_ai_claude_reply: [limit: 100]
+      ],
+      repo: MyApp.Repo.Oban,
+      shutdown_grace_period: 15000,
+      stage_interval: 1000,
+      testing: :disabled
+    },
+    %Oban.Pro.Producer{
+      __meta__: #Ecto.Schema.Metadata<:loaded, "oban", "oban_producers">,
+      uuid: "019a0bd6-6223-74e1-a998-71df4aca1bf7",
+      name: "Oban",
+      node: "mynode-b@127.0.0.1",
+      queue: "amazon_textract_reply",
+      started_at: ~U[2025-10-22 12:13:10.563133Z],
+      updated_at: ~U[2025-10-22 16:03:55.098264Z],
+      ack_async: true,
+      ack_tab: :pro_ack_tab_7,
+      refresh_interval: 30000,
+      xact_delay: 1000,
+      xact_retry: 5,
+      xact_timeout: 30000,
+      meta: %Oban.Pro.Producer.Meta{
+        local_limit: 100,
+        paused: false,
+        shutdown_started_at: nil,
+        global_limit: nil,
+        rate_limit: nil
+      }
+    },
+    :paused,
+    true
+  ]}}
+
+iex(mynode-a@127.0.0.1)103> :dbg.stop()
+:ok
+iex(mynode-a@127.0.0.1)104>

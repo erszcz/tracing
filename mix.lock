@@ -1,0 +1,6 @@
+%{
+  "erlang_doctor": {:hex, :erlang_doctor, "0.3.2", "49eb56c2efede6abb4ba65ae6b018f51128997a4981552f1a62475bcc091d457", [:rebar3], [], "hexpm", "d1d3fcd4ffae55925266c6700964544a51cbf4023a03fcb3824cad78257d6447"},
+  "ex_doctor": {:hex, :ex_doctor, "0.3.2", "a4f5b4d4626c2877b58b31cf9d16f50694a3124014a97af98e7445ca6bf11c79", [:mix], [{:erlang_doctor, "0.3.2", [hex: :erlang_doctor, repo: "hexpm", optional: false]}], "hexpm", "3884f32e0cccdb3f6c4ef766098370c4a3af19a26a1ecd501391ddb493a1ac3d"},
+  "extrace": {:hex, :extrace, "0.6.0", "83ddb14513b50eceadc9bc62cb322daffc0fcc13687c02a77d1f21e5a07f1cc9", [:mix], [{:recon, "~> 2.5", [hex: :recon, repo: "hexpm", optional: false]}], "hexpm", "499c416c363cda0c4a8523e0460d5a6f7a7cdaccf9e180022e4ec0d25735beca"},
+  "recon": {:hex, :recon, "2.5.6", "9052588e83bfedfd9b72e1034532aee2a5369d9d9343b61aeb7fbce761010741", [:mix, :rebar3], [], "hexpm", "96c6799792d735cc0f0fd0f86267e9d351e63339cbe03df9d162010cefc26bb0"},
+}

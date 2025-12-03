@@ -10,6 +10,7 @@ defmodule Tracing.Application do
     children = [
       # Starts a worker by calling: Tracing.Worker.start_link(arg)
       # {Tracing.Worker, arg}
+      Tracing.EchoServer
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
