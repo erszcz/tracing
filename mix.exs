@@ -24,6 +24,8 @@ defmodule Tracing.MixProject do
     [
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:erlang_doctor,
+       git: "https://github.com/erszcz/erlang_doctor.git", branch: "master", override: true},
       {:ex_doctor, "~> 0.3.2"},
       {:extrace, "~> 0.6.0"},
       {:recon, "~> 2.5"}

@@ -284,7 +284,7 @@ No IP address provided. Using random task: arn:aws:ecs:eu-west-1:723258730172:ta
 ...
 iex> :ssl.start; :inets.start; \
   for p <- ["erlang_doctor/master/src/tr.erl", "ex_doctor/main/lib/ex_doctor.ex"] do \
-    {:ok, {{_, 200, _}, _, src}} = :httpc.request("https://raw.githubusercontent.com/chrzaszcz/" <> p); \
+    {:ok, {{_, 200, _}, _, src}} = :httpc.request("https://raw.githubusercontent.com/erszcz/" <> p); \
     tp = "/tmp/" <> Path.basename(p); File.write!(tp, src); c tp \
   end; \
   import ExDoctor; :tr.start
