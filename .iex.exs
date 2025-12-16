@@ -16,3 +16,5 @@ import IExExtras
 import ExDoctor
 
 alias :tr, as: Tr
+
+Agent.start(fn -> Bandit.start_link(plug: Tidewave, port: 4040) end)
