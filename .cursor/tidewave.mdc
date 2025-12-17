@@ -1,0 +1,10 @@
+---
+alwaysApply: true
+---
+
+If the Tidewave MCP is available to you:
+* Always use Tidewave's tools for evaluating code, querying the database, etc.
+* Use `get_docs` to access documentation and the `get_source_location` tool to find module/function definitions.
+* Use `get_logs` to query runtime errors 
+* Use `get_models` and `get_schemas` to understand project schema definitions
+* Use `execute_sql_query` to query the local database - never make alterations to the database using this tool - only use it to query.

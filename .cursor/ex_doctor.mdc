@@ -1,0 +1,9 @@
+---
+alwaysApply: true
+---
+
+When Tidewave MCP is available, you can use the `project_eval` tool to use ExDoctor (aka `ex_doctor`) library.
+ExDoctor allows for tracing Elixir function calls and message passing, as well as processing traces.
+Use Tidewave `search_package_docs` tool to understand its full functionality.
+
+When using Tidewave `project_eval` tool to call ExDoctor, you can convert traces to maps with `ExDoctor.to_map/1`.
